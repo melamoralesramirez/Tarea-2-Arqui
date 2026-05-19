@@ -1,0 +1,146 @@
+<div class="contenedor">
+  <header class="encabezado">
+    <div>
+      <h1>Gestión de Productos</h1>
+      <p>CRUD de productos usando Angular + ASP.NET Core + SQL Server.</p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <h2>{{ editando ? 'Editar producto' : 'Nuevo producto' }}</h2>
+
+    <form class="formulario" (ngSubmit)="guardarProducto()">
+      <div class="campo">
+        <label>Nombre</label>
+        <input
+          type="text"
+          name="nombre"
+          [(ngModel)]="productoForm.nombre"
+          placeholder="Ej: Laptop Lenovo"
+        />
+      </div>
+
+      <div class="campo">
+        <label>Descripción</label>
+        <input
+          type="text"
+          name="descripcion"
+          [(ngModel)]="productoForm.descripcion"
+          placeholder="Descripción del producto"
+        />
+      </div>
+
+      <div class="fila">
+        <div class="campo">
+          <label>Precio</label>
+          <input
+            type="number"
+            name="precio"
+            [(ngModel)]="productoForm.precio"
+            min="0"
+          />
+        </div>
+
+        <div class="campo">
+          <label>Stock</label>
+          <input
+            type="number"
+            name="stock"
+            [(ngModel)]="productoForm.stock"
+            min="0"
+          />
+        </div>
+
+        <div class="campo check" *ngIf="editando">
+          <label>Activo</label>
+          <select name="activo" [(ngModel)]="productoForm.activo">
+            <option [ngValue]="true">Sí</option>
+            <option [ngValue]="false">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="acciones-form">
+        <button type="submit" class="btn principal">
+          {{ editando ? 'Actualizar' : 'Guardar' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn secundario"
+          *ngIf="editando"
+          (click)="cancelarEdicion()"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+
+    <p class="mensaje" *ngIf="mensaje">{{ mensaje }}</p>
+    <p class="error" *ngIf="error">{{ error }}</p>
+  </section>
+
+  <section class="panel">
+    <div class="barra">
+      <h2>Lista de productos</h2>
+
+      <div class="acciones">
+        <button class="btn secundario" (click)="cargarProductos()">Ver todos</button>
+        <button class="btn secundario" (click)="cargarActivos()">Ver activos</button>
+        <button class="btn alerta" (click)="cargarStockBajo()">Stock bajo</button>
+      </div>
+    </div>
+
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Activo</th>
+            <th>Fecha creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let producto of productos">
+            <td>{{ producto.id }}</td>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.descripcion }}</td>
+            <td>₡{{ producto.precio | number:'1.2-2' }}</td>
+            <td>
+              <span [class.stock-bajo]="producto.stock <= 5">
+                {{ producto.stock }}
+              </span>
+            </td>
+            <td>
+              <span [class.activo]="producto.activo" [class.inactivo]="!producto.activo">
+                {{ producto.activo ? 'Sí' : 'No' }}
+              </span>
+            </td>
+            <td>{{ producto.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+            <td class="acciones-tabla">
+              <button class="btn editar" (click)="editarProducto(producto)">
+                Editar
+              </button>
+
+              <button class="btn eliminar" (click)="eliminarProducto(producto.id)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="productos.length === 0">
+            <td colspan="8" class="sin-datos">
+              No hay productos registrados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
